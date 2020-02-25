@@ -4,7 +4,8 @@
 package mx.ipn.escom.neuropsiauthserver.config;
 
 import java.util.Arrays;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,23 +24,29 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableResourceServer
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
-	@Override
-	public void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers(HttpMethod.GET).permitAll().anyRequest().authenticated().and().cors()
-				.configurationSource(getConfigurationSource());
-	}
+  private static final Logger log = LoggerFactory.getLogger(ResourceServerConfig.class);
 
-	@Bean
-	public CorsConfigurationSource getConfigurationSource() {
-		UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource;
-		urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
-		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowCredentials(true);
-		configuration.setAllowedHeaders(Arrays.asList("*"));
-		configuration.setAllowedOrigins(Arrays.asList("*")); // dev && prod url
-		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-		urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", configuration);
-		return urlBasedCorsConfigurationSource;
-	}
+  @Override
+  public void configure(HttpSecurity http) throws Exception {
+    log.info("SETTING UP HttpSecurity ");
+    http.authorizeRequests().antMatchers(HttpMethod.GET).authenticated() //
+        .antMatchers(HttpMethod.POST, "/oauth/token").permitAll() //
+        .anyRequest().authenticated() //
+        .and().cors().configurationSource(getConfigurationSource());
+  }
+
+  @Bean
+  public CorsConfigurationSource getConfigurationSource() {
+    log.info("SETTING UP CorsConfigurationSource");
+    UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource;
+    urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowCredentials(true);
+    configuration.setAllowedHeaders(Arrays.asList("*"));
+    configuration.setAllowedOrigins(Arrays.asList("*")); // dev && prod url
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", configuration);
+    return urlBasedCorsConfigurationSource;
+  }
 
 }

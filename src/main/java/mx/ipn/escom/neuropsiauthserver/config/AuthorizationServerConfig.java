@@ -1,6 +1,10 @@
 package mx.ipn.escom.neuropsiauthserver.config;
 
+import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,47 +20,63 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
-//	@Autowired
-//	private DataSource dataSource;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+  private static final Logger log = LoggerFactory.getLogger(AuthorizationServerConfig.class);
 
-	@Autowired
-	private AccessTokenConverter accessTokenConverter;
 
-	@Autowired
-	private AuthenticationManager authenticationManager;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
-	@Autowired
-	private TokenStore tokenStore;
+  @Autowired
+  private AccessTokenConverter accessTokenConverter;
 
-	private String clientId = "vuejwtclient";
-	private String secret = "secret";
-	private int accessTokenValiditySeconds = 3600;
-	private int refreshTokenValiditySeconds = 3600;
-	private String readScope = "read";
-	private String writeScope = "write";
-	private String passwordGrantType = "password";
-	private String refreshGrantType = "refresh_token";
+  @Autowired
+  private AuthenticationManager authenticationManager;
 
-	@Override
-	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-		security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
-	}
+  @Autowired
+  private TokenStore tokenStore;
 
-	@Override
-	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		clients.inMemory().withClient(clientId).secret(passwordEncoder.encode(secret))
-				.accessTokenValiditySeconds(accessTokenValiditySeconds)
-				.refreshTokenValiditySeconds(refreshTokenValiditySeconds).scopes(readScope, writeScope)
-				.authorizedGrantTypes(passwordGrantType, refreshGrantType);
-	}
+  @Value("${spring.security.oauth.client-id}")
+  private String clientId = "vuejwtclient";
 
-	@Override
-	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-		endpoints.accessTokenConverter(accessTokenConverter).tokenStore(tokenStore)
-				.authenticationManager(authenticationManager);
-	}
+  @Value("${spring.security.oauth.client-secret}")
+  private String secret = "secret";
+
+  @Value("${spring.security.oauth.access-token-validity-seconds}")
+  private int accessTokenValiditySeconds = 3600;
+
+  @Value("${spring.security.oauth.refresh-token-validity-seconds}")
+  private int refreshTokenValiditySeconds = 3600;
+
+  @Value("#{'${spring.security.oauth.scopes}'.split(',')}")
+  private String[] scopes;
+
+  @Value("#{'${spring.security.oauth.grant-types}'.split(',')}")
+  private String[] grantTypes;
+
+  @Override
+  public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+    security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
+  }
+
+  @Override
+  public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+    log.info("SETTING UP ClientDetailsServiceConfigurer");
+    log.info(Arrays.toString(grantTypes));
+    clients.inMemory() //
+        .withClient(clientId) //
+        .secret(passwordEncoder.encode(secret)) //
+        .accessTokenValiditySeconds(accessTokenValiditySeconds) //
+        .refreshTokenValiditySeconds(refreshTokenValiditySeconds) //
+        .scopes(scopes) //
+        .authorizedGrantTypes(grantTypes);
+  }
+
+  @Override
+  public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+    log.info("SETTING UP AuthorizationServerEndpointsConfigurer");
+    endpoints.accessTokenConverter(accessTokenConverter).tokenStore(tokenStore)
+        .reuseRefreshTokens(false).authenticationManager(authenticationManager);
+  }
 
 }

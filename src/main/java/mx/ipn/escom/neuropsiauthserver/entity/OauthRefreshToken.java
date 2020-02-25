@@ -11,24 +11,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "oauth_access_token")
-public class OauthAccessToken implements Serializable {
+@Table(name = "oauth_refresh_token")
+public class OauthRefreshToken implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   @Id
-  private String authenticationId;
-
   private String tokenId;
 
   private Blob token;
 
-  private String userName;
-
-  private String clientId;
-
   private Blob authentication;
-
-  private String refreshToken;
 
 }

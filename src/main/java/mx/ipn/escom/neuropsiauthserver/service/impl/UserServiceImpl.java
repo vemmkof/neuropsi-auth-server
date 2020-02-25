@@ -1,4 +1,4 @@
-package mx.ipn.escom.neuropsiauthserver.service;
+package mx.ipn.escom.neuropsiauthserver.service.impl;
 
 import java.util.Optional;
 
