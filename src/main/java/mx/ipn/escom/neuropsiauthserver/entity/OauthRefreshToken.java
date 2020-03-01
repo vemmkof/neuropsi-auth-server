@@ -5,6 +5,7 @@ import java.sql.Blob;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,8 +20,10 @@ public class OauthRefreshToken implements Serializable {
   @Id
   private String tokenId;
 
+  @JsonIgnore
   private Blob token;
 
+  @JsonIgnore
   private Blob authentication;
 
 }
