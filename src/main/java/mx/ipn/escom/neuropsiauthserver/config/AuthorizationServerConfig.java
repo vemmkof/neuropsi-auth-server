@@ -37,16 +37,16 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
   private TokenStore tokenStore;
 
   @Value("${spring.security.oauth.client-id}")
-  private String clientId = "vuejwtclient";
+  private String clientId;
 
   @Value("${spring.security.oauth.client-secret}")
-  private String secret = "secret";
+  private String clientSecret;
 
   @Value("${spring.security.oauth.access-token-validity-seconds}")
-  private int accessTokenValiditySeconds = 3600;
+  private int accessTokenValiditySeconds;
 
   @Value("${spring.security.oauth.refresh-token-validity-seconds}")
-  private int refreshTokenValiditySeconds = 3600;
+  private int refreshTokenValiditySeconds;
 
   @Value("#{'${spring.security.oauth.scopes}'.split(',')}")
   private String[] scopes;
@@ -57,6 +57,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
   @Override
   public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
     security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
+    // security.tokenKeyAccess("permitAll()").checkTokenAccess("permitAll()");
   }
 
   @Override
@@ -65,7 +66,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     log.info(Arrays.toString(grantTypes));
     clients.inMemory() //
         .withClient(clientId) //
-        .secret(passwordEncoder.encode(secret)) //
+        .secret(passwordEncoder.encode(clientSecret)) //
         .accessTokenValiditySeconds(accessTokenValiditySeconds) //
         .refreshTokenValiditySeconds(refreshTokenValiditySeconds) //
         .scopes(scopes) //
