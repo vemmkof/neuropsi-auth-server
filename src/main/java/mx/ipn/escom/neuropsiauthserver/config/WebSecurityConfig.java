@@ -32,9 +32,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private String signingKey;
 
   @Autowired
-  private DataSource dataSource;
-
-  @Autowired
   private UserDetailsService userDetailsService;
 
   @Override
@@ -72,17 +69,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
   @Bean
-  public TokenStore getTokenStore() {
+  public TokenStore getTokenStore(DataSource dataSource) {
     log.info("SETTING UP TokenStore");
     return new JdbcTokenStore(dataSource);
   }
 
   @Bean
   @Primary
-  public DefaultTokenServices getDefaultTokenServices() {
+  public DefaultTokenServices getDefaultTokenServices(DataSource dataSource) {
     log.info("SETTING UP DefaultTokenServices");
     DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-    defaultTokenServices.setTokenStore(getTokenStore());
+    defaultTokenServices.setTokenStore(getTokenStore(dataSource));
     defaultTokenServices.setSupportRefreshToken(true);
     return defaultTokenServices;
   }

@@ -1,5 +1,6 @@
 package mx.ipn.escom.neuropsiauthserver.dto;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,9 +17,9 @@ public class UserDetailsImpl implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    System.out.println(user.getRoles());
-    return user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName()))
-        .collect(Collectors.toList());
+
+    return Arrays.asList(user.getRole()).stream()
+        .map(role -> new SimpleGrantedAuthority(role.toString())).collect(Collectors.toList());
   }
 
   @Override
@@ -38,7 +39,7 @@ public class UserDetailsImpl implements UserDetails {
 
   @Override
   public boolean isAccountNonLocked() {
-    return !user.isLocked();
+    return !user.isLockedAccount();
   }
 
   @Override

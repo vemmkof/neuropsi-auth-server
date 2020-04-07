@@ -1,6 +1,5 @@
 package mx.ipn.escom.neuropsiauthserver.config;
 
-import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,13 +56,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
   @Override
   public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
     security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
-    // security.tokenKeyAccess("permitAll()").checkTokenAccess("permitAll()");
   }
 
   @Override
   public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
     log.info("SETTING UP ClientDetailsServiceConfigurer");
-    log.info(Arrays.toString(grantTypes));
     clients.inMemory() //
         .withClient(clientId) //
         .secret(passwordEncoder.encode(clientSecret)) //

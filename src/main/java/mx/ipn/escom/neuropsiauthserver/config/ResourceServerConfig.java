@@ -3,6 +3,7 @@ package mx.ipn.escom.neuropsiauthserver.config;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,15 +19,33 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
   private static final Logger log = LoggerFactory.getLogger(ResourceServerConfig.class);
+  @Value("${spring.profiles.active}")
+  private String profile;
 
   @Override
   public void configure(HttpSecurity http) throws Exception {
     log.info("SETTING UP HttpSecurity ");
-    http//
-        .authorizeRequests()//
-        .antMatchers(HttpMethod.POST, "/oauth/**").permitAll() //
-        .anyRequest().authenticated() //
-        .and().cors().configurationSource(getConfigurationSource());
+    if (profile != null && profile.equals("dev")) {
+      http//
+          .authorizeRequests()//
+          .antMatchers(HttpMethod.GET, "/").permitAll() //
+          .antMatchers(HttpMethod.GET, "/csrf").permitAll() //
+          .antMatchers(HttpMethod.GET, "/v2/api-docs").permitAll() //
+          .antMatchers(HttpMethod.GET, "/swagger-ui.html").permitAll() //
+          .antMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll() //
+          .antMatchers(HttpMethod.GET, "/webjars/springfox-swagger-ui/**").permitAll() //
+          .antMatchers(HttpMethod.POST, "/oauth/**").permitAll() //
+          .anyRequest().authenticated() //
+          // .anyRequest().permitAll() //
+          .and().cors().configurationSource(getConfigurationSource());
+    } else {
+      http//
+          .authorizeRequests()//
+          .antMatchers(HttpMethod.POST, "/oauth/**").permitAll() //
+          .anyRequest().authenticated() //
+          .and().cors().configurationSource(getConfigurationSource());
+    }
+
   }
 
   @Bean

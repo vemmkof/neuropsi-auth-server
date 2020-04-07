@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Message implements Serializable {
+public class ResponseDTO implements Serializable {
   private static final long serialVersionUID = 1L;
-  String message;
+  private String message;
 }

@@ -3,102 +3,108 @@ package mx.ipn.escom.neuropsiauthserver.entity;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Positive;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import mx.ipn.escom.neuropsiauthserver.entity.values.Gender;
+import mx.ipn.escom.neuropsiauthserver.entity.values.Role;
 
-@NoArgsConstructor
+
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "user")
 public class User implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 5084202603438255147L;
 
   @Id
-  @Column(name = "id_user")
+  @Column(name = "id_user", nullable = false)
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Positive
   private Long idUser;
 
   @Email
-  @NotEmpty(message = "can't be empty")
+  @NotBlank
   @Column(name = "username", nullable = false)
   private String username;
 
+  @NotEmpty
+  @Min(value = 8)
   @JsonProperty(access = Access.WRITE_ONLY)
-  @NotEmpty(message = "can't be empty")
   @Column(name = "password", nullable = false)
   private String password;
 
-  @NotNull
   @NotEmpty
+  @Column(name = "name", nullable = false)
   private String name;
 
-  @NotNull
   @NotEmpty
+  @Column(name = "lastname", nullable = false)
   private String lastname;
 
-  @NotNull
-  @NotEmpty
+  @Column(name = "second_lastname", nullable = true)
   private String secondLastname;
 
-  @NotNull
-  @NotEmpty
+  @Past
+  @Column(name = "date_of_birth", nullable = false)
   private Date dateOfBirth;
 
-  @NotNull
   @NotEmpty
+  @Column(name = "phone", nullable = false)
   private String phone;
 
-  @NotNull
   @NotEmpty
-  private boolean genre;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private Gender gender;
 
-  @JsonIgnore
-  @Column(name = "expired_account", nullable = false)
+  @NotEmpty
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private Role role;
+
+  @Builder.Default
+  @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
   private boolean expiredAccount = false;
 
-  @JsonIgnore
-  @Column(name = "locked_account", nullable = false)
-  private boolean locked = false;
+  @Builder.Default
+  @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
+  private boolean lockedAccount = false;
 
-  @JsonIgnore
-  @Column(name = "expired_credentials", nullable = false)
+  @Builder.Default
+  @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
   private boolean expiredCredentials = false;
 
-  @JsonIgnore
-  @Column(name = "enabled", nullable = false)
-  private boolean enabled = true;
+  @Builder.Default
+  @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
+  private boolean enabled = false;
 
   @CreationTimestamp
+  @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private Timestamp created;
 
   @UpdateTimestamp
   private Timestamp updated;
 
-  @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-  @JoinTable(name = "user_role", //
-      joinColumns = {@JoinColumn(referencedColumnName = "id_user")}, //
-      inverseJoinColumns = {@JoinColumn(referencedColumnName = "id_role")}//
-  )
-  private List<Role> roles;
 }
+

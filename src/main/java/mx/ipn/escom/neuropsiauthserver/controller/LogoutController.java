@@ -8,7 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import mx.ipn.escom.neuropsiauthserver.dto.Message;
+import mx.ipn.escom.neuropsiauthserver.dto.ResponseDTO;
 import mx.ipn.escom.neuropsiauthserver.service.SessionService;
 
 @Validated
@@ -20,12 +20,12 @@ public class LogoutController {
   private SessionService sessionService;
 
   @DeleteMapping
-  public ResponseEntity<Message> logout(@Validated Principal principal) {
+  public ResponseEntity<ResponseDTO> logout(@Validated Principal principal) {
     boolean isLoggedOut = sessionService.logout(principal.getName());
     if (isLoggedOut) {
-      return new ResponseEntity<Message>(new Message("Logout successful"), HttpStatus.OK);
+      return new ResponseEntity<>(new ResponseDTO("Logout successful"), HttpStatus.OK);
     } else {
-      return new ResponseEntity<Message>(new Message("Unable to logout"), HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>(new ResponseDTO("Unable to logout"), HttpStatus.BAD_REQUEST);
     }
   }
 }
